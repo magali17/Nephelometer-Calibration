@@ -7,17 +7,11 @@ output: word_document
 <http://rmarkdown.rstudio.com>.
 
 ##Q1: ________
-
-
-```{r setup, echo==FALSE}
+ 
+ 
+```{r, echo==FALSE}
+ 
  
 
-
 ```
-
-
-```{r cars}
-summary(cars)
-```
- 
  
