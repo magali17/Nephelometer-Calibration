@@ -872,6 +872,7 @@ geom_abline(aes(colour="One-to-One", intercept = 0, slope = 1)) +
 
 ```
 
+# 11/08/17
 Compare Partisol & Dichot methods (QMU: 50-51, 36) to other gravimetric methods when collocated
 -only looking at stations where grav & LS are also colocated 
 ? look at all data? (use PM instead of Grav.LS)
@@ -929,28 +930,34 @@ write_clip(summary(table4c$R2))
 
 Look at low R2 values, tables of LS vs Grav by year
 2009: Beacon Hill (BW) & Seattle Duwamish Vly (CE) have low R2
--scatter plots
-```{r}
-
-```
-
 -time series
-add smotthign lines.
+-scatter plots
 where do they not agree? what's causing the low R2?
 ```{r}
-df <- Grav.LS[Grav.LS$Year.x=="2009" & (Grav.LS$StationCode=="BW" | Grav.LS$StationCode=="CE"), c("ObservedDate", "StationCode", "Grav.Avg", "LS.Avg", "QmuCode.x", "QmuCode.y")]
+pdf("/Users/magaliblanco/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/output/2009 BW & CE.pdf", width = 8, height=10.5)
 
-#plot.pm.v.date <- function(df, y.label){
-y.label <- "ug/m3"
-  ggplot(data = df, aes(x=ObservedDate, y=Grav.Avg, group=StationCode, colour=StationCode)) + geom_point(alpha=alpha.val) + labs(x="Date", y= y.label, colour="Station Code") +
-  theme(legend.position = "bottom") + geom_smooth(se=F)
+df <- Grav.LS[Grav.LS$Year.x=="2009" & (Grav.LS$StationCode=="BW" | Grav.LS$StationCode=="CE"), c("ObservedDate", "StationCode", "Location", "Grav.Avg", "LS.Avg", "QmuCode.x", "QmuCode.y")]
 
-#}
+stat1 <- c("BW", "CE")
+for (i in 1:length(stat1)){
+mult.fact <- 1
+p1 <- ggplot(data = df[df$StationCode==stat1[i],], aes(x=ObservedDate, y=Grav.Avg)) + geom_line(alpha=.4, aes(colour=as.factor(QmuCode.x))) + geom_line(aes(y = LS.Avg*mult.fact, colour="bscat")) + scale_y_continuous(sec.axis = sec_axis(~./mult.fact, name = "bscat"))+ geom_smooth(se=F) + geom_smooth(se=F, aes(x=ObservedDate, y=LS.Avg)) + theme(legend.position = "bottom") + labs(x="Date", y= "Gravimetric  ug/m3", subtitle= paste("station ", stat1[i], sep="")) 
+
+p2 <- ggplot(data = df[df$StationCode==stat1[i],], aes(y=LS.Avg, x=Grav.Avg, colour=as.factor(QmuCode.x))) + geom_point() + theme(legend.position = "bottom") + labs(y="bscat", x= "Gravimetric  (ug/m3)", subtitle= paste("station ", stat1[i], sep="")) + geom_abline(aes(colour="One-to-One", intercept = 0, slope = 1)) + stat_smooth(aes(colour="Best Fit"), method="lm", se=F)
+
+multiplot(p1,p2)
+}
+
+dev.off()
 ```
 
 
 
 
+compare diff LS values if there is colocation? 
+```{r}
+
+```
 
 
 
