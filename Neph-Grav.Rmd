@@ -7,8 +7,6 @@ output: word_document
 
 ```{r notes, include=FALSE}
  
-#NOTES
-# absolute humidity ESTIMATE: https://carnotcycle.wordpress.com/2012/08/04/how-to-convert-relative-humidity-to-absolute-humidity/
 ```
 
 ```{r global_options, include=F, echo=F}
@@ -134,59 +132,6 @@ ggplot(data=PM.grav.y.source, aes(x=Grav.Avg, y=y.source.Avg)) +  geom_point(alp
   labs(x="Gravimetric PM2.5 (ug/m3)", y= y.label, colour= "PM2.5 QMU Codes\n& Lines", subtitle = paste("R2 = ", round(lmGravSource$r.squared,2), ", B0 = ", round(lmGravSource$coefficients[1,1],2), ", B1 = ", round(lmGravSource$coefficients[2,1], 2))) #+ scale_color_manual(values=c("One-to-one"="blue", "Best Fit"="gray")) #, "high" = "orange", "low" = "green")) #+
 
 }
-
-```
-
-```{r fun: old? corr by station for QMU, rh, temp, season...}
-# # CORRELATION BY STATION, COLOUR = QMU CODE & rh high/low
-# plot.grav.corr.by.station <- function(y.source.name, y.label){
-# PM.grav <- subset(PM, Source=="Gravimetric" & !is.na(Daily24HourAvg))
-# colnames(PM.grav)[colnames(PM.grav)=="Daily24HourAvg"] <- "Grav.Avg"
-# PM.y.source.name <- subset(PM, Source== y.source.name & !is.na(Daily24HourAvg))
-# colnames(PM.y.source.name)[colnames(PM.y.source.name)=="Daily24HourAvg"] <- "y.source.Avg"
-# PM.grav.y.source <- merge(PM.grav, PM.y.source.name, by=c("ObservedDate", "StationCode", "StationNo", "RH_category", "SeaTac_RH", "Year", "Season"), all=F)
-# #uniq.stat <- unique(PM.grav.y.source$StationNo) #StationCode
-# #uniq.stat.yr <- unique(PM.grav.y.source[c("StationNo", "Location", "Year")]) #$StationNo) #StationCode
-# 
-# for (i in 1:length(uniq.stat)) {
-# lmGravSource <- summary(lm(y.source.Avg~Grav.Avg, data=PM.grav.y.source[PM.grav.y.source$StationNo==uniq.stat[i],]))
-# 
-# # #colour by QMU code
-# # p1 <- ggplot(data=PM.grav.y.source[PM.grav.y.source$StationNo== uniq.stat[i],], aes(x=Grav.Avg, y=y.source.Avg)) + geom_point(alpha=alpha.val, aes(colour=as.factor(QmuCode.x))) + geom_abline(aes(colour="One-to-one", intercept = 0, slope = 1)) + 
-# #   stat_smooth(aes(colour="Best Fit"), method="lm", se=F) + theme(legend.position = "bottom") + labs(x="Gravimetric PM2.5 (ug/m3)", y= y.label, colour= "PM2.5 QMU", subtitle = paste("Station ", uniq.stat[i], "\nR2 = ", round(lmGravSource$r.squared,2), ", B0 = ", round(lmGravSource$coefficients[1,1],2), ", B1 = ", round(lmGravSource$coefficients[2,1], 2), sep="")) + xlim(0, quantile(PM.grav.y.source$Grav.Avg, 0.9999, na.rm = T)) + ylim(0, quantile(PM.grav.y.source$y.source.Avg, 0.9999, na.rm = T)) #+  scale_color_manual(values=c("One-to-one"="black", "Best Fit"="gray", "QmuCode.y"=QmuCode.y )) 
-# # 
-# # #print(p)
-# # 
-# # #colour by rh category
-# # p2 <- ggplot(data=PM.grav.y.source[PM.grav.y.source$StationNo== uniq.stat[i],], aes(x=Grav.Avg, y=y.source.Avg)) + geom_point(alpha=alpha.val, aes(colour=as.factor(RH_category))) + geom_abline(aes(colour="One-to-one", intercept = 0, slope = 1)) + 
-# #   stat_smooth(aes(colour="Best Fit"), method="lm", se=F) + theme(legend.position = "bottom") + labs(x="Gravimetric PM2.5 (ug/m3)", y= y.label, colour= "RH", subtitle = paste("Station ", uniq.stat[i], "\nHigh RH: >45%, R2 = ", round(lmGravSource$r.squared,2), ", B0 = ", round(lmGravSource$coefficients[1,1],2), ", B1 = ", round(lmGravSource$coefficients[2,1], 2), sep="")) + xlim(0, quantile(PM.grav.y.source$Grav.Avg, 0.9999, na.rm = T)) + ylim(0, quantile(PM.grav.y.source$y.source.Avg, 0.9999, na.rm = T)) #+ scale_fill_manual("", values = df.col)   # + scale_color_manual(values=c("One-to-one"="blue", "Best Fit"="gray")) 
-# # 
-# # #scale_color_manual(values= ...   , "high"= "orange", "low"="green")
-# # #print(p)
-# # 
-# # #colour by temp category
-# # p3 <- ggplot(data=PM.grav.y.source[PM.grav.y.source$StationNo== uniq.stat[i],], aes(x=Grav.Avg, y=y.source.Avg, colour=as.factor(Temp_F_Category.y))) + geom_point(alpha=alpha.val) + geom_abline(aes(colour="One-to-one", intercept = 0, slope = 1)) + 
-# #   stat_smooth(aes(colour="Best Fit"), method="lm", se=F) + theme(legend.position = "bottom") + labs(x="Gravimetric PM2.5 (ug/m3)", y= y.label, colour= "Temp", subtitle = paste("Station ", uniq.stat[i], "\nR2 = ", round(lmGravSource$r.squared,2), ", B0 = ", round(lmGravSource$coefficients[1,1],2), ", B1 = ", round(lmGravSource$coefficients[2,1], 2), sep="")) + xlim(0, quantile(PM.grav.y.source$Grav.Avg, 0.9999, na.rm = T)) + ylim(0, quantile(PM.grav.y.source$y.source.Avg, 0.9999, na.rm = T)) #+ scale_fill_manual("", values = df.col)   # + scale_color_manual(values=c("One-to-one"="blue", "Best Fit"="gray")) 
-# # 
-# # #scale_color_manual(values= ...   , "high"= "orange", "low"="green")
-# # #print(p)
-# 
-# #colour by season
-# p4 <- ggplot(data=PM.grav.y.source[PM.grav.y.source$StationNo== uniq.stat[i],], aes(x=Grav.Avg, y=y.source.Avg, colour=as.factor(Season.y))) + geom_point(alpha=alpha.val) + geom_abline(aes(colour="One-to-one", intercept = 0, slope = 1)) + 
-#   stat_smooth(aes(colour="Best Fit"), method="lm", se=F) + theme(legend.position = "bottom") + labs(x="Gravimetric PM2.5 (ug/m3)", y= y.label, colour= "Season", subtitle = paste("Station ", uniq.stat[i], "\nR2 = ", round(lmGravSource$r.squared,2), ", B0 = ", round(lmGravSource$coefficients[1,1],2), ", B1 = ", round(lmGravSource$coefficients[2,1], 2), sep="")) + xlim(0, quantile(PM.grav.y.source$Grav.Avg, 0.9999, na.rm = T)) + ylim(0, quantile(PM.grav.y.source$y.source.Avg, 0.9999, na.rm = T)) #+ scale_fill_manual("", values = df.col)   # + scale_color_manual(values=c("One-to-one"="blue", "Best Fit"="gray")) 
-# 
-# #scale_color_manual(values= ...   , "high"= "orange", "low"="green")
-# #print(p)
-# 
-# 
-# #colour by year
-# p5 <- ggplot(data=PM.grav.y.source[PM.grav.y.source$StationNo== uniq.stat[i],], aes(x=Grav.Avg, y=y.source.Avg, colour=as.factor(Year.y))) + geom_point(alpha=alpha.val) + geom_abline(aes(colour="One-to-one", intercept = 0, slope = 1)) + 
-#   stat_smooth(aes(colour="Best Fit"), method="lm", se=F) + theme(legend.position = "bottom") + labs(x="Gravimetric PM2.5 (ug/m3)", y= y.label, colour= "Year", subtitle = paste("Station ", uniq.stat[i], "\nR2 = ", round(lmGravSource$r.squared,2), ", B0 = ", round(lmGravSource$coefficients[1,1],2), ", B1 = ", round(lmGravSource$coefficients[2,1], 2), sep="")) + xlim(0, quantile(PM.grav.y.source$Grav.Avg, 0.9999, na.rm = T)) + ylim(0, quantile(PM.grav.y.source$y.source.Avg, 0.9999, na.rm = T)) #+ scale_fill_manual("", values = df.col)   # + scale_color_manual(values=c("One-to-one"="blue", "Best Fit"="gray")) 
-# 
-# 
-# multiplot(p4,p5, cols=1) #p1,p2,p3, cols=2
-# 
-# } }
 
 ```
 
@@ -343,12 +288,6 @@ PM2.5_BC_UV_data$Source <- "Gravimetric"
 light_scattering_data <- read_excel("~/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/Datasets/UWPSCAAqueries/LightScattering data.xlsx", col_types = c("text", "text", "date", "numeric"))
 light_scattering_data$Source <- "Light Scattering"
 
-# TSP_data <- read_excel("~/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/Datasets/UWPSCAAqueries/TSP data.xlsx", col_types = c("text", "text", "date", "numeric"))
-# TSP_data$Source <- "TSP"
-
-# Visual_Range_data <- read_excel("~/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/Datasets/UWPSCAAqueries/Visual Range data.xlsx", col_types = c("text", "numeric", "date", "numeric"))
-# Visual_Range_data$Source <- "Visual Range"
-
 PM <- rbind(PM2.5_BC_UV_data,light_scattering_data)
 #PM2 <-rbind(PM2.5_BC_UV_data,light_scattering_data,TSP_data, RH.long)
 
@@ -377,9 +316,7 @@ PM <- merge(PM, StationUnique, by="StationCode", all = T)
 
 #add columns to ID which stations sample which sources
 PM$SamplesGrav <- as.numeric(ifelse(PM$Source=="Gravimetric", 1, 0))
-#PM$SamplesTSP <- as.numeric(ifelse(PM$Source=="TSP", 1, 0))
 PM$SamplesLS <- as.numeric(ifelse(PM$Source=="Light Scattering", 1, 0)) 
-# PM$SamplesVR <- as.numeric(ifelse(PM$Source=="Visual Range", 1, 0)) 
 
 agg1 <- PM[c("StationCode", "SamplesGrav",  "SamplesLS")] #"SamplesTSP",
 agg.max <- aggregate(data=agg1, .~StationCode, FUN=max)
@@ -387,8 +324,6 @@ agg.max <- aggregate(data=agg1, .~StationCode, FUN=max)
 PM <- PM[!colnames(PM) %in% c("SamplesGrav",  "SamplesLS")] #"SamplesTSP",
 PM <- merge(PM, agg.max, all.x=T)
  
-#PM <- PM[c("StationNo","StationCode", "QmuCode", "ObservedDate", "Daily24HourAvg", "Source", "UnitsShort", "FinalLat","FinalLong", "SeaTac_Temp_C", "SeaTac_RH",  "SeaTac_AbsHum_g_m3", "SeaTac_Vis_m", "SamplesGrav", "SamplesTSP", "SamplesLS", "FinalLong", "FinalLong", "Elevation", "Location", "Address", "Region", "Start Year", "End Year")]  
-
 #categorize RH: high vs low
 PM$RH_category <- factor(ifelse(PM$SeaTac_RH <=40, "<=40%", ">40%"))
 
@@ -424,19 +359,12 @@ Grav.LS.short <- merge(PM.grav[c(KeepCols, "Grav.Avg")], PM.LS[c(KeepCols, "LS.A
 ```
  
 ```{r GIS data}
-#crate csv file for ArcGIS
-# unique.stations <- as.data.frame(unique(PM$StationCode))
-# colnames(unique.stations) <- "StationCode"
-# 
-# PM.samples <- PM[c("StationCode", "SamplesGrav", "SamplesTSP", "SamplesLS")]
-# PM.samples <- aggregate(data=PM.samples, cbind(SamplesGrav, SamplesTSP, SamplesLS)~StationCode, FUN=max)
-# station.info <- merge(merge(unique.stations, Stations, by="StationCode", all.x=T), PM.samples, all.x=T)
-
+ 
 GIS <- unique(PM[c("StationNo", "StationCode", "Location", "FinalLat", "FinalLong", "Start Year", "End Year", "Elevation", "SamplesGrav", "SamplesTSP", "SamplesLS")])
 GIS <- GIS[!is.na(GIS$Location),]
 
 
-write_csv(GIS, "/Users/magaliblanco/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/output/GIS_Stations.csv")
+#write_csv(GIS, "/Users/magaliblanco/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/output/GIS_Stations.csv")
 
 ```
 
@@ -544,13 +472,7 @@ plot.station.v.date(PM[PM$Source=="Gravimetric",])  #+ theme(legend.position = "
 
 ```
 
-TSP data availability  
-```{r TSP_data_avail}
-plot.station.v.date(PM[PM$Source=="TSP",]) #+ theme(legend.position = "none")
-
-```
-
-Light scattering data availability  
+ Light scattering data availability  
 ```{r Light_scattering_data_avail}
 
 plot.station.v.date(PM[PM$Source=="Light Scattering",]) #+ theme(legend.position = "none")
@@ -587,7 +509,6 @@ table2 <-table2[c("Source", "StartDate", "EndDate", "YearRange", "Values", "Mean
 #write_clip(table2)
 ```
 
-
 # Time Series
 PM2.5 Over Time  
 ```{r PM2.5byStation, include=F}
@@ -600,18 +521,6 @@ plot.pm.v.date(PM[PM$Source=="Gravimetric",], "PM2.5 (ug/m3)")
 plot.pm.date.per.station("Gravimetric", "PM2.5 (ug/m3)")
 
 dev.off()
-```
-
-TSP Over Time  
-```{r TSPbyStation, include=F}
-pdf("/Users/magaliblanco/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/output/TSP Time Series.pdf", width = 10.5, height=3)
-
-plot.pm.v.date(PM[PM$Source=="TSP",], "TSP (ug/m3)") 
-
-plot.pm.date.per.station("TSP", "TSP (ug/m3)")
-
-dev.off()
-
 ```
 
 Light Scattering Over Time  
@@ -628,31 +537,6 @@ dev.off()
 
 # Data Comparison
 Grouped by Date and Station  
-
-## TSP
-correlation plots
-```{r TSP corr}
-pdf("/Users/magaliblanco/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/output/TSP v PM2.5.pdf", width = 8, height=11)
-
-plot.grav.corr("TSP", "TSP (ug/sdm3)")  #all data, colour= QMU.x
-plot.corr.by.grav.Qmu("TSP", "TSP (ug/sdm3)")  #ID which methods poor
-plot.corr.sta.yr.season("TSP", "TSP (ug/sdm3)") #corr by station. yr & season
-#plot.grav.corr.by.station("TSP", "TSP (ug/sdm3)")
-
-dev.off()
-
-```
-
-fitted vs actual plots 
-```{r TSP fitted}
-pdf("/Users/magaliblanco/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/output/TSP fitted.pdf", width = 8, height=11)
-
-plot.fitted.all.yr.season("TSP", "TSP") # fitted vs grav, all
-plot.fitted.sta.yr.season("TSP", "TSP") #fitted vs grav for each station
-
-dev.off()
-```
-
 ## LS 
 Correlation plots 
 ```{r LS corr}
@@ -873,10 +757,33 @@ geom_abline(aes(colour="One-to-One", intercept = 0, slope = 1)) +
 ```
 
 # 11/08/17
-Compare Partisol & Dichot methods (QMU: 50-51, 36) to other gravimetric methods when collocated
+Look at low R2 values, tables of LS vs Grav by year
+2009: Beacon Hill (BW) & Seattle Duwamish Vly (CE) have low R2
+-time series
+-scatter plots
+where do they not agree? what's causing the low R2?
+```{r}
+pdf("/Users/magaliblanco/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/output/2009 BW & CE.pdf", width = 8, height=10.5)
+
+df <- Grav.LS[Grav.LS$Year.x=="2009" & (Grav.LS$StationCode=="BW" | Grav.LS$StationCode=="CE"), c("ObservedDate", "StationCode", "Location", "Grav.Avg", "LS.Avg", "QmuCode.x", "QmuCode.y")]
+
+stat1 <- c("BW", "CE")
+for (i in 1:length(stat1)){
+mult.fact <- 1
+p1 <- ggplot(data = df[df$StationCode==stat1[i],], aes(x=ObservedDate, y=Grav.Avg)) + geom_line(alpha=.4, aes(colour=as.factor(QmuCode.x))) + geom_line(aes(y = LS.Avg*mult.fact, colour="bscat")) + scale_y_continuous(sec.axis = sec_axis(~./mult.fact, name = "bscat"))+ geom_smooth(se=F) + geom_smooth(se=F, aes(x=ObservedDate, y=LS.Avg)) + theme(legend.position = "bottom") + labs(x="Date", y= "Gravimetric  ug/m3", subtitle= paste("station ", stat1[i], sep="")) 
+
+p2 <- ggplot(data = df[df$StationCode==stat1[i],], aes(y=LS.Avg, x=Grav.Avg, colour=as.factor(QmuCode.x))) + geom_point() + theme(legend.position = "bottom") + labs(y="bscat", x= "Gravimetric  (ug/m3)", subtitle= paste("station ", stat1[i], sep="")) + geom_abline(aes(colour="One-to-One", intercept = 0, slope = 1)) + stat_smooth(aes(colour="Best Fit"), method="lm", se=F)
+
+multiplot(p1,p2)
+}
+
+dev.off()
+```
+
+Compare Partisol & Dichot methods (QMU: 50-51, 36) to other gravimetric methods when collocated BY STATION
 -only looking at stations where grav & LS are also colocated 
 ? look at all data? (use PM instead of Grav.LS)
-```{r table 4c ref vs other grav methods}
+```{r table 4c ref vs other grav methods by station}
 ref.QMUs <- c(36, 50, 51)
 KeepCols <- c("ObservedDate", "StationCode", "Location", "QmuCode.x", "Method.x", "Grav.Avg")
 part.dichot <- Grav.LS[Grav.LS$QmuCode.x== ref.QMUs, c(KeepCols)]
@@ -928,27 +835,62 @@ write_clip(summary(table4c$R2))
 
 ```
 
-Look at low R2 values, tables of LS vs Grav by year
-2009: Beacon Hill (BW) & Seattle Duwamish Vly (CE) have low R2
--time series
--scatter plots
-where do they not agree? what's causing the low R2?
-```{r}
-pdf("/Users/magaliblanco/Everything/School/PhD_UW/Courses/1. Aut 2017/ENVH 595 Rotation A/data-cleanup/output/2009 BW & CE.pdf", width = 8, height=10.5)
+Compare Partisol & Dichot methods (QMU: 50-51, 36) to other gravimetric methods when collocated
+```{r table 4d ref vs others}
+uniq.QMU.x <- unique(Grav.LS[c("QmuCode.x", "Method.x", "Quantity.x")])
 
-df <- Grav.LS[Grav.LS$Year.x=="2009" & (Grav.LS$StationCode=="BW" | Grav.LS$StationCode=="CE"), c("ObservedDate", "StationCode", "Location", "Grav.Avg", "LS.Avg", "QmuCode.x", "QmuCode.y")]
+table4d <- data.frame(QMU.x=uniq.QMU.x$QmuCode.x,
+                     Method.x = uniq.QMU.x$Method.x,
+                     Quantity.x = uniq.QMU.x$Quantity.x,
+                     Pairs=rep(NA, length(uniq.QMU.x$QmuCode.x)),
+                     slope=rep(NA, length(uniq.QMU.x$QmuCode.x)),
+                     int= rep(NA, length(uniq.QMU.x$QmuCode.x)),
+                     R2=rep(NA, length(uniq.QMU.x$QmuCode.x)))
+#overall correlation
+lm1 <- summary(lm(data=Grav.LS, Grav.Avg~LS.Avg))
 
-stat1 <- c("BW", "CE")
-for (i in 1:length(stat1)){
-mult.fact <- 1
-p1 <- ggplot(data = df[df$StationCode==stat1[i],], aes(x=ObservedDate, y=Grav.Avg)) + geom_line(alpha=.4, aes(colour=as.factor(QmuCode.x))) + geom_line(aes(y = LS.Avg*mult.fact, colour="bscat")) + scale_y_continuous(sec.axis = sec_axis(~./mult.fact, name = "bscat"))+ geom_smooth(se=F) + geom_smooth(se=F, aes(x=ObservedDate, y=LS.Avg)) + theme(legend.position = "bottom") + labs(x="Date", y= "Gravimetric  ug/m3", subtitle= paste("station ", stat1[i], sep="")) 
-
-p2 <- ggplot(data = df[df$StationCode==stat1[i],], aes(y=LS.Avg, x=Grav.Avg, colour=as.factor(QmuCode.x))) + geom_point() + theme(legend.position = "bottom") + labs(y="bscat", x= "Gravimetric  (ug/m3)", subtitle= paste("station ", stat1[i], sep="")) + geom_abline(aes(colour="One-to-One", intercept = 0, slope = 1)) + stat_smooth(aes(colour="Best Fit"), method="lm", se=F)
-
-multiplot(p1,p2)
+for (i in 1:length(uniq.QMU.x$QmuCode.x)){
+  df <- Grav.LS[Grav.LS$QmuCode.x==uniq.QMU.x$QmuCode.x[i],]
+  lm1 <- summary(lm(data=df, Grav.Avg~LS.Avg))
+  
+  table4d$Pairs[i] <- length(df$ObservedDate)
+  table4d$slope[i] <- round(lm1$coefficients[2,1],2)
+  table4d$int[i] <- round(lm1$coefficients[1,1],2)
+  table4d$R2[i] <- round(lm1$r.squared,3)
 }
 
-dev.off()
+#write_clip(table4d)
+
+```
+
+```{r table 4e}
+uniq.QMU <- unique(Grav.LS[c("QmuCode.x", "Method.x", "Quantity.x", "QmuCode.y", "Method.y", "Quantity.y")])
+
+table4e <- data.frame(QMU.x=uniq.QMU$QmuCode.x,
+                     Method.x = uniq.QMU$Method.x,
+                     Quantity.x = uniq.QMU$Quantity.x,
+                     QMU.y=uniq.QMU$QmuCode.y,
+                     Method.y = uniq.QMU$Method.y,
+                     Quantity.y = uniq.QMU$Quantity.y,
+                     Pairs=rep(NA, length(uniq.QMU$QmuCode.x)),
+                     slope=rep(NA, length(uniq.QMU$QmuCode.x)),
+                     int= rep(NA, length(uniq.QMU$QmuCode.x)),
+                     R2=rep(NA, length(uniq.QMU$QmuCode.x)))
+#overall correlation
+lm1 <- summary(lm(data=Grav.LS, Grav.Avg~LS.Avg))
+
+for (i in 1:length(uniq.QMU$QmuCode.x)){
+  df <- Grav.LS[Grav.LS$QmuCode.x==uniq.QMU$QmuCode.x[i] & Grav.LS$QmuCode.y==uniq.QMU$QmuCode.y[i],]
+  lm1 <- summary(lm(data=df, Grav.Avg~LS.Avg))
+  
+  table4e$Pairs[i] <- length(df$ObservedDate)
+  table4e$slope[i] <- round(lm1$coefficients[2,1],2)
+  table4e$int[i] <- round(lm1$coefficients[1,1],2)
+  table4e$R2[i] <- round(lm1$r.squared,3)
+}
+
+#write_clip(table4e)
+
 ```
 
 
